@@ -23,9 +23,10 @@ class Settings(BaseSettings):
     classifier: str = "demo"
     price_per_billion_tokens: float = 0.0
 
-    # Jev
+    # Jev (TypeSafe System One)
     jev_api_key: str = ""
-    jev_base_url: str = ""
+    jev_base_url: str = "https://api.typesafe.ai/v1"
+    jev_model: str = "jev-latest"
 
     # LLM (no defaults — required when classifier == "llm")
     llm_provider: str = ""

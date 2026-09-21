@@ -15,7 +15,9 @@ def get_classifier(settings: Settings | None = None) -> Classifier:
     if choice == "demo":
         return DemoClassifier()
     if choice == "jev":
-        return JevClassifier(api_key=settings.jev_api_key, base_url=settings.jev_base_url)
+        return JevClassifier(
+            api_key=settings.jev_api_key, base_url=settings.jev_base_url, model=settings.jev_model
+        )
     if choice == "llm":
         return LLMClassifier(
             provider=settings.llm_provider,

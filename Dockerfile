@@ -2,8 +2,8 @@ FROM python:3.12-slim
 
 WORKDIR /app
 
-# System deps for psycopg build are avoided by using the binary wheel.
-COPY pyproject.toml ./
+# Metadata + source. Build context is the repo root.
+COPY pyproject.toml README.md ./
 COPY server ./server
 COPY evals ./evals
 

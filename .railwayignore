@@ -1,0 +1,14 @@
+# Keep local-only and heavy artifacts out of the deploy upload.
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+dev.db
+*.db
+node_modules/
+video/
+demo/
+marketing/
+out/
+.git/

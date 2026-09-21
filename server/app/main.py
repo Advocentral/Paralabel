@@ -13,7 +13,7 @@ from fastapi import FastAPI
 
 from ..triage.loader import available_templates
 from .config import get_settings
-from .routers import google
+from .routers import demo, google
 
 
 @asynccontextmanager
@@ -30,6 +30,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Paralabel", version="0.1.0", lifespan=lifespan)
 app.include_router(google.router)
+app.include_router(demo.router)
 
 
 @app.get("/health")

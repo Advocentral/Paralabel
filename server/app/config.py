@@ -60,6 +60,13 @@ class Settings(BaseSettings):
     # Dashboard
     dashboard_origin: str = "http://localhost:3000"
 
+    # Public "try the triage" demo endpoint (for the marketing site)
+    demo_template: str = "general"
+    demo_rate_per_hour: int = 20          # per-IP requests/hour
+    demo_daily_jev_budget: int = 1000     # max real-Jev classifications/day; then fall back to demo
+    demo_shared_secret: str = ""          # if set, callers must send X-Demo-Token
+    turnstile_secret: str = ""            # Cloudflare Turnstile secret (optional bot check)
+
 
 @lru_cache
 def get_settings() -> Settings:

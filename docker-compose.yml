@@ -1,0 +1,35 @@
+# Local development stack. `docker compose up` brings up Postgres and the API.
+# The Next.js dashboard service is added in Milestone 4.
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: jev
+      POSTGRES_PASSWORD: jev
+      POSTGRES_DB: jev
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://jev:jev@db:5432/jev
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  db_data:

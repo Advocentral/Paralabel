@@ -1,0 +1,168 @@
+{
+  "template_key": "general",
+  "name": "General practice",
+  "parent_label": "Paralabel/",
+  "questions": [
+    {
+      "key": "sender_type",
+      "prompt": "Who sent this email, relative to our law firm?",
+      "answer_type": "single_choice",
+      "allowed_answers": ["prospect", "client", "court", "opposing_side", "colleague", "vendor", "marketing"],
+      "is_system": true,
+      "enabled": true
+    },
+    {
+      "key": "deadline_window",
+      "prompt": "If this email implies a deadline for us, how soon is it?",
+      "answer_type": "single_choice",
+      "allowed_answers": ["within_3_days", "days_4_to_14", "later", "none"],
+      "is_system": true,
+      "enabled": true
+    },
+    {
+      "key": "needs_reply",
+      "prompt": "Does this email need a reply from someone at the firm?",
+      "answer_type": "yes_no",
+      "allowed_answers": ["yes", "no"],
+      "is_system": true,
+      "enabled": true
+    },
+    {
+      "key": "possible_phishing",
+      "prompt": "Does this email look like phishing or a scam (fake e-signature, credential lure, spoofed sender)?",
+      "answer_type": "yes_no",
+      "allowed_answers": ["yes", "no"],
+      "is_system": true,
+      "enabled": true
+    }
+  ],
+  "labels": [
+    {"name": "Held: possible phishing", "color": "#cc3a21", "description": "Suspected phishing — do not click links.", "is_system": true, "sort_order": 1},
+    {"name": "Check manually", "color": "#e07798", "description": "Classifier was not confident; a human should look.", "is_system": true, "sort_order": 2},
+    {"name": "Deadlines & court", "color": "#8e63ce", "description": "Court notices and time-sensitive mail.", "sort_order": 3},
+    {"name": "Clients", "color": "#16a765", "description": "Existing clients and prospects.", "sort_order": 4},
+    {"name": "Opposing side", "color": "#ffad46", "description": "Opposing counsel and parties.", "sort_order": 5},
+    {"name": "Colleagues & vendors", "color": "#4986e7", "description": "Internal and vendor mail.", "sort_order": 6},
+    {"name": "Newsletters & marketing", "color": "#999999", "description": "Everything else.", "sort_order": 7},
+    {"name": "Due ≤3 days", "color": "#cc3a21", "description": "Deadline within 3 days.", "sort_order": 8},
+    {"name": "Due 4–14 days", "color": "#ffad46", "description": "Deadline in 4–14 days.", "sort_order": 9}
+  ],
+  "lists": {
+    "Court domains": [],
+    "Opposing counsel": [],
+    "VIP clients": []
+  },
+  "rules": [
+    {
+      "id": "phishing",
+      "name": "Possible phishing",
+      "position": 1,
+      "match_mode": "all",
+      "stop_processing": true,
+      "is_system_protected": true,
+      "conditions": [
+        {"kind": "classifier", "question_key": "possible_phishing", "mode": "is", "answers": ["yes"], "prob_op": "gte", "threshold": 0.6}
+      ],
+      "actions": {"add_labels": ["Held: possible phishing"]}
+    },
+    {
+      "id": "low_confidence",
+      "name": "Low confidence on sender type",
+      "position": 2,
+      "match_mode": "all",
+      "stop_processing": true,
+      "conditions": [
+        {"kind": "classifier", "question_key": "sender_type", "mode": "top_prob", "prob_op": "lt", "threshold": 0.7}
+      ],
+      "actions": {"add_labels": ["Check manually"]}
+    },
+    {
+      "id": "due_3",
+      "name": "Due within 3 days (tag)",
+      "position": 3,
+      "match_mode": "all",
+      "stop_processing": false,
+      "conditions": [
+        {"kind": "classifier", "question_key": "deadline_window", "mode": "is", "answers": ["within_3_days"]}
+      ],
+      "actions": {"add_labels": ["Due ≤3 days"]}
+    },
+    {
+      "id": "due_14",
+      "name": "Due in 4–14 days (tag)",
+      "position": 4,
+      "match_mode": "all",
+      "stop_processing": false,
+      "conditions": [
+        {"kind": "classifier", "question_key": "deadline_window", "mode": "is", "answers": ["days_4_to_14"]}
+      ],
+      "actions": {"add_labels": ["Due 4–14 days"]}
+    },
+    {
+      "id": "court",
+      "name": "Court sender",
+      "position": 5,
+      "match_mode": "all",
+      "stop_processing": true,
+      "conditions": [
+        {"kind": "classifier", "question_key": "sender_type", "mode": "is", "answers": ["court"]}
+      ],
+      "actions": {"add_labels": ["Deadlines & court"]}
+    },
+    {
+      "id": "urgent_deadline",
+      "name": "Urgent deadline (non-marketing)",
+      "position": 6,
+      "match_mode": "all",
+      "stop_processing": true,
+      "conditions": [
+        {"kind": "classifier", "question_key": "deadline_window", "mode": "is", "answers": ["within_3_days"]},
+        {"kind": "classifier", "question_key": "sender_type", "mode": "is", "answers": ["marketing", "vendor"], "negate": true}
+      ],
+      "actions": {"add_labels": ["Deadlines & court"]}
+    },
+    {
+      "id": "clients",
+      "name": "Prospects and clients",
+      "position": 7,
+      "match_mode": "all",
+      "stop_processing": true,
+      "conditions": [
+        {"kind": "classifier", "question_key": "sender_type", "mode": "is", "answers": ["prospect", "client"]}
+      ],
+      "actions": {"add_labels": ["Clients"]}
+    },
+    {
+      "id": "opposing",
+      "name": "Opposing side",
+      "position": 8,
+      "match_mode": "all",
+      "stop_processing": true,
+      "conditions": [
+        {"kind": "classifier", "question_key": "sender_type", "mode": "is", "answers": ["opposing_side"]}
+      ],
+      "actions": {"add_labels": ["Opposing side"]}
+    },
+    {
+      "id": "colleagues",
+      "name": "Colleagues and vendors",
+      "position": 9,
+      "match_mode": "all",
+      "stop_processing": true,
+      "conditions": [
+        {"kind": "classifier", "question_key": "sender_type", "mode": "is", "answers": ["colleague", "vendor"]}
+      ],
+      "actions": {"add_labels": ["Colleagues & vendors"]}
+    },
+    {
+      "id": "fallback",
+      "name": "Everything else",
+      "position": 99,
+      "match_mode": "all",
+      "stop_processing": true,
+      "is_fallback": true,
+      "conditions": [],
+      "actions": {"add_labels": ["Newsletters & marketing"]}
+    }
+  ]
+}

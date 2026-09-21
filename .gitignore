@@ -1,0 +1,24 @@
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.venv/
+venv/
+.env
+*.db
+dev.db
+node_modules/
+.next/
+dist/
+build/
+.DS_Store
+
+# Marketing/demo video (Remotion) — kept out of the code repo
+video/
+
+# Marketing content (posts, videos) — not part of the code repo
+marketing/
+
+# Interactive demo page — kept out of the code repo
+demo/
